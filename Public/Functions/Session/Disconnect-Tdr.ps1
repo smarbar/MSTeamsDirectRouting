@@ -11,7 +11,7 @@ function Disconnect-Tdr {
   .INPUTS
     None
   .OUTPUTS
-    System.tring
+    System.string
   .NOTES
     Disconnects any open AzureAD and Microsoft Teams Sessions
   .COMPONENT

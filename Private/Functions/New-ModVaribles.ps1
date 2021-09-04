@@ -1,4 +1,5 @@
 function New-ModVariables {
+  [CmdletBinding()]
   param(
     [Parameter(Mandatory=$false)]
     [switch]$clear
@@ -10,12 +11,12 @@ function New-ModVariables {
     msteamsession = ""
     role = ""
     Prefix = ""
-    onlinepstngateway1 = ""
-    onlinepstngateway2 = ""
+    onlinepstngateway1 = "onpg1"
+    onlinepstngateway2 = "onpg2"
     pstnusage = ""
     onlinevoiceroute = ""
     onlinevoiceroutingpolicy = ""
-    numpatt = ""
+    numpatt = ".*"
     AaGuiD = "ce933385-9390-45d1-9512-c8d228074e07"
     CqGuid = "11cd3e2e-fccb-42ad-ad00-878b93575e07"
   }

@@ -11,7 +11,7 @@ function Connect-Tdr {
   .INPUTS
     None
   .OUTPUTS
-    System.tring
+    System.string
   .NOTES
     This CmdLet can be used to establish a session to: AzureAD and MicrosoftTeams
     Each Service has different requirements for connection, query (Get-CmdLets), and action (other CmdLets)

@@ -1,4 +1,6 @@
-Add MSTeamsDriectRouting version check and prompt to update if one is available 
+Add MSTeamsDriectRouting version check and prompt to update if one is available
+Allow parameter entries for new-tdrroutingsetup
+set-modvariables - validation or url in pstngateway variables 
  
  
  

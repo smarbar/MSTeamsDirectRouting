@@ -1,4 +1,5 @@
 function New-TdrResourceAccount {
+  [CmdletBinding()]
   [Parameter(Mandatory=$true, ValueFromPipeline=$true, Position=0)]
   [string]$Username,
   [Parameter(Mandatory=$true, ValueFromPipeline=$true, Position=1)]

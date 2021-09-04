@@ -5,10 +5,13 @@ function Set-ModVariables {
     } catch {}
   } until ($?)
   $MSTeamsSettings.prefix = $prefix.ToUpper()
-  $MSTeamsSettings.onlinepstngateway1 = Read-Host "Enter the primary SBC FQDN"
+  do {
+    try {
+      $MSTeamsSettings.onlinepstngateway1 = Read-Host "Enter the primary SBC FQDN"
+    } catch {}
+  } until ($?)
   $MSTeamsSettings.onlinepstngateway2 = Read-Host "Enter the secondary SBC FQDN"
   $MSTeamsSettings.pstnusage = $MSTeamsSettings.prefix + "-PSTNUsage"
   $MSTeamsSettings.onlinevoiceroute = $MSTeamsSettings.prefix + "-Voice-Route"
   $MSTeamsSettings.onlinevoiceroutingpolicy = $MSTeamsSettings.prefix + "-Route-Policy"
-  $MSTeamsSettings.numpatt = ".*"
 }
