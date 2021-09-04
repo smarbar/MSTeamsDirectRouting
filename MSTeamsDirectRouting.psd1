@@ -12,10 +12,10 @@
 RootModule = 'MSTeamsDirectRouting.psm1'
 
 # Version number of this module.
-ModuleVersion = '1.0.1'
+ModuleVersion = '1.0.2'
 
 # Supported PSEditions
-# CompatiblePSEditions = @()
+CompatiblePSEditions = @('Desktop')
 
 # ID used to uniquely identify this module
 GUID = 'b5c7a41b-024f-4a42-a22e-a7fc4303d0e7'
@@ -66,7 +66,7 @@ PowerShellVersion = '5.1'
 # FormatsToProcess = @()
 
 # Modules to import as nested modules of the module specified in RootModule/ModuleToProcess
-# NestedModules = @('MSTeamsDirectRouting.psm1')
+# NestedModules = @('')
 
 # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
 FunctionsToExport = @(
@@ -104,10 +104,19 @@ PrivateData = @{
     PSData = @{
 
         # Tags applied to this module. These help with module discovery in online galleries.
-        # Tags = @()
+        Tags = @(
+            'Microsoft Teams',
+            'Teams',
+            'Direct Routing',
+            'AA',
+            'Auto Attendant',
+            'Voice',
+            'Enterprise Voice',
+            'Call Queue'
+        )
 
         # A URL to the license for this module.
-        # LicenseUri = ''
+        LicenseUri = 'https://github.com/smarbar/MSTeamsDirectRouting/blob/main/LICENSE'
 
         # A URL to the main website for this project.
         # ProjectUri = ''

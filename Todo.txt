@@ -1,3 +1,7 @@
+Add MSTeamsDriectRouting version check and prompt to update if one is available 
+ 
+ 
+ 
  enable-newteamsuser
  check license is assigned
  
