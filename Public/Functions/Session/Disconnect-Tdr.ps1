@@ -24,9 +24,10 @@ function Disconnect-Tdr {
     https://github.com/smarbar/MSTeamsDirectRouting/tree/main/docs
   #>
   Disconnect-AzureAD
+  Set-OutputColour "Green" "Successfully Disconnected from AzureAD"
   Disconnect-MicrosoftTeams
+  Set-OutputColour "Green" "Successfully Disconnected from MicrosoftTeams"
   $MSTeamsSettings.azureadsession = ""
   $MSTeamsSettings.msteamsession = ""
-  Set-OutputColour "Green" "Disconnected"
   New-ModVariables -clear
 }

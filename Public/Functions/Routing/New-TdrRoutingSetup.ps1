@@ -6,15 +6,16 @@ function New-TdrRoutingSetup {
     Creates a PSTNUsage, VoiceRoute and VoiceRoutingPolicy and links them together based off of user input 
   .EXAMPLE
     New-TdrRoutingSetup
-    Create a PSTNUsage in th format XXX-PSTNUsage based of a 3 digit prefix entered at the command prompt or supplied by parameter
-
+    Create a PSTNUsage in the format XXX-PSTNUsage based of a 3 digit prefix entered at the command prompt
+    Creates a VoiceRoute in the format XXX-Voice-Route and assigns the 2 FQDNs entered at the command prompt it also associates the previously created PSTNUsage
+    Creates a VoiceRoutingPolicy in the format XXX-Route-Polcy and associates the previously created PSTNUsage
   .INPUTS
     System.string
   .OUTPUTS
     System.string
   .NOTES
     This command will create the basic routing records needed to use direct routing  
-  This CmdLet can be used to establish a session to: AzureAD and MicrosoftTeams
+    This CmdLet can be used to establish a session to: AzureAD and MicrosoftTeams
     Each Service has different requirements for connection, query (Get-CmdLets), and action (other CmdLets)
     For AzureAD, no particular role is needed for connection and query. Get-CmdLets are available without an Admin-role.
     For MicrosoftTeams, Teams Administrator Role is required
