@@ -5,33 +5,48 @@ online version:
 schema: 2.0.0
 ---
 
-# Disable-TdrUser
+# Enable-TdrUser
 
 ## SYNOPSIS
-Disbale voice on a user
+{{ Fill in the Synopsis }}
 
 ## SYNTAX
 
 ```
-Disable-TdrUser [-Username] <String> [<CommonParameters>]
+Enable-TdrUser [-Username] <String> [-DDI] <String> [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-Disbales EnterpriseVoice and HostedVoicemail on a user
+{{ Fill in the Description }}
 
 ## EXAMPLES
 
 ### Example 1
 ```powershell
-PS C:\> Disable-TdrUser [-Username] name@domain.com
+PS C:\> {{ Add example code here }}
 ```
 
-Disables EnterpriseVoice and HostedVoicemail on a user
+{{ Add example description here }}
 
 ## PARAMETERS
 
+### -DDI
+{{ Fill DDI Description }}
+
+```yaml
+Type: String
+Parameter Sets: (All)
+Aliases:
+
+Required: True
+Position: 1
+Default value: None
+Accept pipeline input: True (ByValue)
+Accept wildcard characters: False
+```
+
 ### -Username
-Required. UserPrincipalName or LoginName of the Office365 User
+{{ Fill Username Description }}
 
 ```yaml
 Type: String
@@ -56,9 +71,5 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ### System.Object
 ## NOTES
-This CmdLet can be used to disbale voice on a user
 
 ## RELATED LINKS
-[https://github.com/smarbar/MSTeamsDirectRouting/tree/main/docs/Disable-TdrUser.md](https://github.com/smarbar/MSTeamsDirectRouting/tree/main/docs/Disable-TdrUser.md)
-
-[https://github.com/smarbar/MSTeamsDirectRouting/tree/main/docs](https://github.com/smarbar/MSTeamsDirectRouting/tree/main/docs)

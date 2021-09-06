@@ -10,8 +10,8 @@
 #>
 
 # Exporting Module Members (Functions)
-Export-ModuleMember -Function $(Get-ChildItem -Include *.ps1 -Path $PSScriptRoot\Public\Functions -Recurse).BaseName
+Export-ModuleMember -Function $(Get-ChildItem -Include *.ps1 -Path $PSScriptRoot\src\Public\Functions -Recurse).BaseName
 
-Get-ChildItem -Filter *.ps1 -Path $PSScriptRoot\Public\Functions, $PSScriptRoot\Private\Functions -Recurse | ForEach-Object {
+Get-ChildItem -Filter *.ps1 -Path $PSScriptRoot\Public\Functions, $PSScriptRoot\src\Private\Functions -Recurse | ForEach-Object {
   . $_.FullName
 }
