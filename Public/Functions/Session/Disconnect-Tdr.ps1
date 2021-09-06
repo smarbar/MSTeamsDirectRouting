@@ -1,7 +1,7 @@
 function Disconnect-Tdr {
   <#
   .SYNOPSIS
-    Disconnest both AzureAD and Teams sessions
+    Disconnect both AzureAD and Teams sessions
   .DESCRIPTION
     Disconnects any open AzureAD and Microsoft Teams Sessions
   .EXAMPLE
