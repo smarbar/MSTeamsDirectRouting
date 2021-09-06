@@ -59,6 +59,7 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 This CmdLet can be used to disbale voice on a user
 
 ## RELATED LINKS
+
 [https://github.com/smarbar/MSTeamsDirectRouting/tree/main/docs/Disable-TdrUser.md](https://github.com/smarbar/MSTeamsDirectRouting/tree/main/docs/Disable-TdrUser.md)
 
 [https://github.com/smarbar/MSTeamsDirectRouting/tree/main/docs](https://github.com/smarbar/MSTeamsDirectRouting/tree/main/docs)

@@ -26,3 +26,5 @@ Install-Module -Name MSTeamsDirectRouting
 ### Documentation
 
 - All help is available in [/docs](/docs)
+- External Help is available as XML
+- Markdown files for all CmdLets created automatically with PlatyPS and updated with each Version

@@ -13,7 +13,7 @@ Connects to Azure AD and Teams services using the AzureAD and Microsoft Teams Mo
 ## SYNTAX
 
 ```
-Connect-Tdr
+Connect-Tdr [<CommonParameters>]
 ```
 
 ## DESCRIPTION
@@ -31,6 +31,9 @@ Creates a session to MicrosoftTeams prompting for selection of existing loed in 
 
 ## PARAMETERS
 
+### CommonParameters
+This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable, -InformationAction, -InformationVariable, -OutVariable, -OutBuffer, -PipelineVariable, -Verbose, -WarningAction, and -WarningVariable. For more information, see [about_CommonParameters](http://go.microsoft.com/fwlink/?LinkID=113216).
+
 ## INPUTS
 
 ### None
@@ -45,6 +48,7 @@ For AzureAD, no particular role is needed for connection and query. Get-CmdLets 
 For MicrosoftTeams, Teams Administrator Role is required
 
 ## RELATED LINKS
+
 [https://github.com/smarbar/MSTeamsDirectRouting/tree/main/docs/Connect-Tdr.md](https://github.com/smarbar/MSTeamsDirectRouting/tree/main/docs/Connect-Tdr.md)
 
 [https://github.com/smarbar/MSTeamsDirectRouting/tree/main/docs](https://github.com/smarbar/MSTeamsDirectRouting/tree/main/docs)
