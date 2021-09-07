@@ -1,4 +1,3 @@
-[![Build Status](https://smarbar.visualstudio.com/MSTeamsDirectRouting/_apis/build/status/MSTeamsDirectRouting-CI?branchName=main)](https://smarbar.visualstudio.com/MSTeamsDirectRouting/_build/latest?definitionId=1&branchName=main)
 # MSTeamsDirectRouting - Helps to create and administer Teams for Direct Routing
 
 This is the home for `MSTeamsDirectRouting`, a module for Creating and Administering Teams Direct Routing
@@ -7,6 +6,7 @@ This is the home for `MSTeamsDirectRouting`, a module for Creating and Administe
 [![Documentation - GitHub](https://img.shields.io/badge/Documentation-TeamsFunctions-blue.svg)](https://github.com/smarbar/MSTeamsDirectRouting/tree/main/docs)
 [![PowerShell Gallery - TeamsFunctions](https://img.shields.io/badge/PowerShell%20Gallery-TeamsFunctions-blue.svg)](https://www.powershellgallery.com/packages/MSTeamsDirectRouting)
 [![Minimum Supported PowerShell Version](https://img.shields.io/badge/PowerShell-5.1-blue.svg)](https://github.com/smarbar/MSTeamsDirectRouting)
+[![Build Status](https://smarbar.visualstudio.com/MSTeamsDirectRouting/_apis/build/status/MSTeamsDirectRouting-CI?branchName=main)](https://smarbar.visualstudio.com/MSTeamsDirectRouting/_build/latest?definitionId=1&branchName=main)
 <a href="https://www.repostatus.org/#wip"><img src="https://www.repostatus.org/badges/latest/wip.svg" alt="Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public." /></a>
 <!-- <a href="https://www.repostatus.org/#active"><img src="https://www.repostatus.org/badges/latest/active.svg" alt="Project Status: Active – The project has reached a stable, usable state and is being actively developed." /></a> -->
 
