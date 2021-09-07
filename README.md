@@ -1,3 +1,4 @@
+[![Build Status](https://smarbar.visualstudio.com/MSTeamsDirectRouting/_apis/build/status/MSTeamsDirectRouting-CI?branchName=main)](https://smarbar.visualstudio.com/MSTeamsDirectRouting/_build/latest?definitionId=1&branchName=main)
 # MSTeamsDirectRouting - Helps to create and administer Teams for Direct Routing
 
 This is the home for `MSTeamsDirectRouting`, a module for Creating and Administering Teams Direct Routing
