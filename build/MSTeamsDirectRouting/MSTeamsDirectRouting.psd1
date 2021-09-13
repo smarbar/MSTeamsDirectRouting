@@ -97,7 +97,7 @@ PrivateData = @{
     PSData = @{
 
         # Tags applied to this module. These help with module discovery in online galleries.
-        Tags = 'Microsoft Teams','Teams','Direct Routing','AA','Auto Attendant','Voice','Enterprise Voice','Call Queue'
+        Tags = 'MicrosoftTeams','Teams','DirectRouting','AA','AutoAttendant','Voice','EnterpriseVoice','CallQueue'
 
         # A URL to the license for this module.
         LicenseUri = 'https://github.com/smarbar/MSTeamsDirectRouting/blob/main/LICENSE'
