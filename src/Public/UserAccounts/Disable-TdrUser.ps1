@@ -6,6 +6,6 @@ function Disable-TdrUser {
   )
   Test-InitialChecks
   $teamsuser = Get-CsOnlineUser -Identity $Username
-  Set-CsUser -Identity $teamsuser.identity -EnterpriseVoiceEnabled $false -HostedVoiceMail $false
+  Set-CsUser -Identity $teamsuser.identity -EnterpriseVoiceEnabled $false -HostedVoiceMail $false -OnPremLineURI $null
   Set-OutputColour "Green" "$username has been disabled"
 }

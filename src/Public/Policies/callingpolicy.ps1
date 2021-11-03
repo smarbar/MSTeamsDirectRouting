@@ -1,0 +1,1 @@
+Set-CsTeamsCallingPolicy -identity Global -BusyOnBusyEnabledType “Unanswered”

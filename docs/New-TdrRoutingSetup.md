@@ -8,7 +8,7 @@ schema: 2.0.0
 # New-TdrRoutingSetup
 
 ## SYNOPSIS
-Disconnect both AzureAD and Teams sessions
+{{ Fill in the Synopsis }}
 
 ## SYNTAX
 
@@ -17,17 +17,16 @@ New-TdrRoutingSetup [<CommonParameters>]
 ```
 
 ## DESCRIPTION
-Disconnects any open AzureAD and Microsoft Teams Sessions
+{{ Fill in the Synopsis }}
 
 ## EXAMPLES
 
 ### Example 1
 ```powershell
-PS C:\> Disconnect-Tdr
+PS C:\> {{ Fill in the Synopsis }}
 ```
 
-Disconnects from AzureAD, MicrosoftTeams
-Errors and Warnings are suppressed as no verification of existing sessions is undertaken
+{{ Fill in the Synopsis }}
 
 ## PARAMETERS
 
@@ -42,7 +41,7 @@ This cmdlet supports the common parameters: -Debug, -ErrorAction, -ErrorVariable
 
 ### System.Object
 ## NOTES
-This CmdLet can be used to disconnect the sessions to: AzureAD and MicrosoftTeams
+{{ Fill in the Synopsis }}
 
 ## RELATED LINKS
 
