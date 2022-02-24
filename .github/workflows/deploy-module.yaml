@@ -17,7 +17,7 @@ jobs:
         id: versioning
         uses: PaulHatch/semantic-version@v4.0.2
         with:
-          # change_path: ./client
+          change_path: "src"
           branch: main
           # tag_prefix: "v"
           major_pattern: "(MAJOR))"
