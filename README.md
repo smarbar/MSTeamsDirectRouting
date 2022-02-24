@@ -6,7 +6,7 @@ This is the home for `MSTeamsDirectRouting`, a module for Creating and Administe
 [![Documentation - GitHub](https://img.shields.io/badge/Documentation-TeamsFunctions-blue.svg)](https://github.com/smarbar/MSTeamsDirectRouting/tree/main/docs)
 [![PowerShell Gallery - TeamsFunctions](https://img.shields.io/badge/PowerShell%20Gallery-TeamsFunctions-blue.svg)](https://www.powershellgallery.com/packages/MSTeamsDirectRouting)
 [![Minimum Supported PowerShell Version](https://img.shields.io/badge/PowerShell-5.1-blue.svg)](https://github.com/smarbar/MSTeamsDirectRouting)
-[![deploy-msteamsdirectrouting](https://github.com/smarbar/MSTeamsDirectRouting/actions/workflows/deploy-module.yaml/badge.svg?branch=main)](https://github.com/smarbar/MSTeamsDirectRouting/actions/workflows/deploy-module.yaml)
+[![Build](https://github.com/smarbar/MSTeamsDirectRouting/actions/workflows/deploy-module.yaml/badge.svg?branch=main)](https://github.com/smarbar/MSTeamsDirectRouting/actions/workflows/deploy-module.yaml)
 <a href="https://www.repostatus.org/#wip"><img src="https://www.repostatus.org/badges/latest/wip.svg" alt="Project Status: WIP – Initial development is in progress, but there has not yet been a stable, usable release suitable for the public." /></a>
 
 <!-- <a href="https://www.repostatus.org/#active"><img src="https://www.repostatus.org/badges/latest/active.svg" alt="Project Status: Active – The project has reached a stable, usable state and is being actively developed." /></a> -->
