@@ -4,7 +4,7 @@ $docPath = "$PSScriptRoot\docs"
 $moduleName = "MSTeamsDirectRouting"
 $modulePath = "$buildPath\$moduleName"
 $author = 'Scott Barrett'
-$version = '1.0.2'
+$version = '1.0.3'
 
 task Clean {
     If(Get-Module $moduleName){

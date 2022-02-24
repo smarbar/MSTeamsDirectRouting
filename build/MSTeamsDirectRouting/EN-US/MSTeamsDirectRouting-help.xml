@@ -426,11 +426,11 @@
       <command:verb>New</command:verb>
       <command:noun>TdrRoutingSetup</command:noun>
       <maml:description>
-        <maml:para>Disconnect both AzureAD and Teams sessions</maml:para>
+        <maml:para>{{ Fill in the Synopsis }}</maml:para>
       </maml:description>
     </command:details>
     <maml:description>
-      <maml:para>Disconnects any open AzureAD and Microsoft Teams Sessions</maml:para>
+      <maml:para>{{ Fill in the Synopsis }}</maml:para>
     </maml:description>
     <command:syntax>
       <command:syntaxItem>
@@ -460,15 +460,15 @@
     </command:returnValues>
     <maml:alertSet>
       <maml:alert>
-        <maml:para>This CmdLet can be used to disconnect the sessions to: AzureAD and MicrosoftTeams</maml:para>
+        <maml:para>{{ Fill in the Synopsis }}</maml:para>
       </maml:alert>
     </maml:alertSet>
     <command:examples>
       <command:example>
         <maml:title>-------------------------- Example 1 --------------------------</maml:title>
-        <dev:code>PS C:\&gt; Disconnect-Tdr</dev:code>
+        <dev:code>PS C:\&gt; {{ Fill in the Synopsis }}</dev:code>
         <dev:remarks>
-          <maml:para>Disconnects from AzureAD, MicrosoftTeams Errors and Warnings are suppressed as no verification of existing sessions is undertaken</maml:para>
+          <maml:para>{{ Fill in the Synopsis }}</maml:para>
         </dev:remarks>
       </command:example>
     </command:examples>

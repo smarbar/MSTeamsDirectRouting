@@ -1,3 +1,23 @@
+function New-TdrCallerIdPolicy {
+    [CmdletBinding()]
+    param(
+      [Parameter(Mandatory=$true, ValueFromPipeline=$true, Position=0)]
+      [string]$PolicyName,
+      [Parameter(Mandatory=$true, ValueFromPipeline=$true, Position=1)]
+      [string]$ResourceAccount,
+      [Parameter(Mandatory=$true, ValueFromPipeline=$true, Position=2)]
+      [string]$NamePresentation,
+      [Parameter(Mandatory=$false)]
+      [switch]$AllowUserOverride
+    )
+    
+    $ObjId = (Get-CsOnlineApplicationInstance -Identity $ResourceAccount).ObjectId
+    switch ($AllowUserOverride) {
+        $true { New-CsCallingLineIdentity  -Identity $PolicyName -CallingIDSubstitute Resource -EnableUserOverride $true -ResourceAccount $ObjId -CompanyName NamePresentation}
+        $false { New-CsCallingLineIdentity  -Identity $PolicyName -CallingIDSubstitute Resource -EnableUserOverride $false -ResourceAccount $ObjId -CompanyName NamePresentation }
+    }
+  }
+Set-CsTeamsCallingPolicy -identity Global -BusyOnBusyEnabledType “Unanswered”
 function Enable-TdrResourceAccount {
   [CmdletBinding()]
   param(
@@ -36,7 +56,6 @@ function New-TdrRoutingSetup {
   Set-CsOnlinePstnUsage -identity Global -Usage @{Add=$pstnusage}
   New-CsOnlineVoiceRoute -identity $MSTeamsSettings.onlinevoiceroute -NumberPattern $MSTeamsSettings.numpatt -OnlinePstnGatewayList = $OnlinePstnGateway -priority 1 -OnlinePstnUsages $MSTeamsSettings.pstnusage
   New-CsOnlineVoiceRoutingPolicy $MSTeamsSettings.onlinevoiceroutingpolicy -OnlinePstnUsages $MSTeamsSettings.pstnusage
-  Set-CsTeamsCallingPolicy -identity Global -BusyOnBusyEnabledType “Unanswered”
 }
 function Connect-Tdr {
   New-ModVariables
@@ -87,8 +106,25 @@ function Disable-TdrUser {
   )
   Test-InitialChecks
   $teamsuser = Get-CsOnlineUser -Identity $Username
-  Set-CsUser -Identity $teamsuser.identity -EnterpriseVoiceEnabled $false -HostedVoiceMail $false
+  Set-CsUser -Identity $teamsuser.identity -EnterpriseVoiceEnabled $false -HostedVoiceMail $false -OnPremLineURI $null
   Set-OutputColour "Green" "$username has been disabled"
+}
+function Enable-TdrUser {
+  $FilePath = "C:\Teams"
+  $csvImport = Import-Csv $FilePath\users.csv
+
+  # need to test data formating
+  foreach ($item in $csvImport){
+    $username = $item.username
+    $ddi = "+44" + $item.ddi
+    Write-Output "Enabling $username"
+    $teamsuser = Get-CsOnlineUser -Identity $username
+    Set-CsUser -Identity $teamsuser.id -EnterpriseVoiceEnabled $true -HostedVoiceMail $true -OnPremLineURI tel:$ddi
+    Grant-CsOnlineVoiceRoutingPolicy -Identity $teamsuser.id -PolicyName $onlinevoiceroutingpolicy
+    # Grant-CsTenantDialPlan -Identity $teamsuser.id -PolicyName $tenantdialplan
+    Grant-CsTeamsCallingPolicy -Identity $teamsuser.id -PolicyName AllowCalling
+    Write-Output "---------------------------------------------------------------------"
+  }
 }
 function Enable-TdrUser {
   [CmdletBinding()]
@@ -119,6 +155,19 @@ function Enable-TdrUser {
   Set-CsUser -Identity $teamsuser.identity -EnterpriseVoiceEnabled $true -HostedVoiceMail $true -OnPremLineURI tel:$DDI
   Grant-CsOnlineVoiceRoutingPolicy -Identity $teamsuser.identity -PolicyName $onlinevoiceroutingpolicy
   Grant-CsTeamsCallingPolicy -Identity $teamsuser.identity -PolicyName AllowCalling
+}
+function Get-TdrUser {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory=$true, ValueFromPipeline=$true, Position=0)]
+    [string]$Username
+  )
+
+  $teamsuser = Get-CsOnlineUser -Identity $Username
+  $teamsuser | select 'UserPrincipalName',
+    'identity','OnPremLineURI','OnPremLineURIManuallySet','LineURI','EnterpriseVoiceEnabled','OnPremEnterpriseVoiceEnabled',
+    'HostedVoiceMail','HostedVoicemailPolicy','VoicePolicy','HostingProvider','RegistrarPool','VoiceRoutingPolicy','TeamsCallingPolicy',
+    'OnlineVoiceRoutingPolicy','CallerIdPolicy','CallingLineIdentity','TeamsUpgradeEffectiveMode','DialPlan','TenantDialPlan' | fl
 }
 function Check-ModVersion {
   $TdrModPsGallery = find-module MSTeamsDirectRouting
@@ -217,4 +266,7 @@ function Test-PoshVersion {
     Set-OutputColour "Red" "Please launch the correct version and try again."
     break
   }
+}
+function Test-TdrDomain {
+  Get-CsTenant | fl tenantid,domain* 
 }

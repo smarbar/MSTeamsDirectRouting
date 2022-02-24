@@ -1,0 +1,31 @@
+name: deploy-msteamsdirectrouting
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: windows-2019
+    steps:
+      - name: "Checkout GitHub Action"
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Semantic versioning
+        id: versioning
+        uses: PaulHatch/semantic-version@v4.0.2
+        with:
+          change_path: ./client
+          branch: main
+          # tag_prefix: "v"
+          major_pattern: "(MAJOR))"
+          minor_pattern: "(MINOR)"
+          format: "${major}.${minor}.${patch}"
+          bump_each_commit: true
+      - name: "Run build script"
+        env:
+          GALLERY_API_KEY: ${{ secrets.GALLERY_API_KEY }}
+        shell: powershell
+        run: .\AzBuild.ps1 -Task All -Version ${{ steps.versioning.outputs.version }}
