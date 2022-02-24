@@ -3,7 +3,8 @@ Deploy Module {
       FromSource Build\MSTeamsDirectRouting
       To PSGallery
       WithOptions @{
-          ApiKey = $ENV:GALLERY_API_KEY
+        #test
+        ApiKey = $ENV:GALLERY_API_KEY
       }
   }
 }
