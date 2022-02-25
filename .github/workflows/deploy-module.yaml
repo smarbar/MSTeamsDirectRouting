@@ -28,4 +28,4 @@ jobs:
         env:
           GALLERY_API_KEY: ${{ secrets.GALLERY_API_KEY }}
         shell: powershell
-        run: .\AzBuild.ps1 -Task modulebuild -Version ${{ steps.versioning.outputs.version }}
+        run: .\AzBuild.ps1 -Task All -Version ${{ steps.versioning.outputs.version }}
