@@ -1,10 +1,23 @@
-function Test-ModuleInstalled ([string]$modname) {
-  $moduleinstalled = Get-Module -ListAvailable $modname
-  Set-OutputColour "Green" "Checking $modname module is installed..."
-  if (!($moduleinstalled)){
-    Set-OutputColour "Yellow" "$modname module is not installed. Installing now..."
-    Install-Module -Name $modname -Force
-    Import-Module $modname -Force
+function Test-ModuleInstalled {
+  param(
+    [string[]] $modname=@()
+  )
+  $installed = $false
+  foreach ($mod in $modname) {
+    if (!($installed)) {
+      Set-OutputColour "Green" "Checking $mod module is installed..."
+      $moduleinstalled = Get-Module -ListAvailable $mod
+      if($moduleinstalled) {
+        $installed = $true
+        Set-OutputColour "Green" "$mod is installed"
+      }
+    }
   }
-  $MSTeamsSettings.$modname = "Installed"
+  $newmod = $modname[0]
+  if (!($installed)){
+    Set-OutputColour "Yellow" "$newmod module is not installed. Installing now..."
+    Install-Module -Name $newmod -Force
+    Import-Module $newmod -Force
+  }
+  $MSTeamsSettings.$newmod = "Installed"
 }

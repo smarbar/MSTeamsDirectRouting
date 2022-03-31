@@ -1,7 +1,7 @@
 function Set-ModVariables {
   do {
     try {
-    [ValidatePattern('^[A-Z]{3}$')]$prefix = Read-Host "Enter the 3 letter prifix to use for this customer, A to Z only" 
+    [ValidatePattern('^[A-Z]{3}$')]$prefix = Read-Host "Enter the 3 letter prifix to use for this Direct Routing connection, A to Z only" 
     } catch {}
   } until ($?)
   $MSTeamsSettings.prefix = $prefix.ToUpper()

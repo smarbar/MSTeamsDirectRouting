@@ -1,23 +1,70 @@
-function New-TdrCallerIdPolicy {
+﻿function New-TdrCLIPolicy {
     [CmdletBinding()]
     param(
-      [Parameter(Mandatory=$true, ValueFromPipeline=$true, Position=0)]
+      [Parameter(Mandatory=$true, HelpMessage='Enter the Policy name', ValueFromPipeline=$true, Position=0)]
       [string]$PolicyName,
-      [Parameter(Mandatory=$true, ValueFromPipeline=$true, Position=1)]
+      [Parameter(Mandatory=$true, HelpMessage='Enter the Resource Account UPN to be assigned', ValueFromPipeline=$true, Position=1)]
       [string]$ResourceAccount,
-      [Parameter(Mandatory=$true, ValueFromPipeline=$true, Position=2)]
-      [string]$NamePresentation,
-      [Parameter(Mandatory=$false)]
+      [Parameter(Mandatory=$true, HelpMessage='Enter the Policy display name', ValueFromPipeline=$true, Position=2)]
+      [string]$DisplayName,
+      [Parameter(Mandatory=$false, HelpMessage='Allow the user to override the CLI Policy')]
       [switch]$AllowUserOverride
     )
     
     $ObjId = (Get-CsOnlineApplicationInstance -Identity $ResourceAccount).ObjectId
-    switch ($AllowUserOverride) {
-        $true { New-CsCallingLineIdentity  -Identity $PolicyName -CallingIDSubstitute Resource -EnableUserOverride $true -ResourceAccount $ObjId -CompanyName NamePresentation}
-        $false { New-CsCallingLineIdentity  -Identity $PolicyName -CallingIDSubstitute Resource -EnableUserOverride $false -ResourceAccount $ObjId -CompanyName NamePresentation }
-    }
+    New-CsCallingLineIdentity  -Identity $PolicyName -CallingIDSubstitute Resource -EnableUserOverride $AllowUserOverride -ResourceAccount $ObjId -CompanyName $DisplayName
+    # switch ($AllowUserOverride) {
+    #     $true { New-CsCallingLineIdentity  -Identity $PolicyName -CallingIDSubstitute Resource -EnableUserOverride $true -ResourceAccount $ObjId -CompanyName $DisplayName}
+    #     $false { New-CsCallingLineIdentity  -Identity $PolicyName -CallingIDSubstitute Resource -EnableUserOverride $false -ResourceAccount $ObjId -CompanyName $DisplayName }
+    # }
   }
-Set-CsTeamsCallingPolicy -identity Global -BusyOnBusyEnabledType “Unanswered”
+function New-TdrCliPolicyBulk {
+  $FilePath = "C:\Teams"
+  $csvImport = Import-Csv $FilePath\clipolicy.csv
+
+  $errors = @()
+
+  foreach ($item in $csvImport){ 
+    try {
+      $ResourceUpn = $item.ResourceUpn
+      $PolicyName = $item.PolicyName
+      $displayName = "$item.displayName"
+      Write-Output "Creating $ResourceUpn"
+      New-TdrCliPolicy -ResourceUpn $ResourceUpn -PolicyName $PolicyName -DisplayName $DisplayName 
+    } catch {
+      Write-Output "Error enabling $ResourceUpn"
+      $errors += $_
+    }
+    Write-Output "---------------------------------------------------------------------"
+  }
+  if ($errors) {
+    Write-Output "The following errors were encountered"
+    $errors
+  }
+}
+function Enable-TdrResourceAccountBulk {
+  $FilePath = "C:\Teams"
+  $csvImport = Import-Csv $FilePath\resource.csv
+
+  $errors = @()
+
+  foreach ($item in $csvImport){ 
+    try {
+      $username = $item.username
+      $ddi = "+44" + $item.ddi
+      Write-Output "Enabling $username"
+      Enable-TdrResourceAccount -Username $Username -DDI $ddi
+    } catch {
+      Write-Output "Error enabling $username"
+      $errors += $_
+    }
+    Write-Output "---------------------------------------------------------------------"
+  }
+  if ($errors) {
+    Write-Output "The following errors were encountered"
+    $errors
+  }
+}
 function Enable-TdrResourceAccount {
   [CmdletBinding()]
   param(
@@ -26,35 +73,76 @@ function Enable-TdrResourceAccount {
     [Parameter(Mandatory=$true, ValueFromPipeline=$true, Position=1)]
     [string]$DDI
   )
-  $resourceAccount = Get-CsOnlineApplicationInstance -Identity $username
-  if($resourceAccount) {
-    Test-DdiFormat $DDI
-    Set-CsOnlineApplicationInstance -Identity $Username -OnpremPhoneNumber $DDI
-  } else {
-    Set-OutputColour "Red" "$username does not exist yet, please create it and assign the appropriate license first"
+  $licensePlanList = Get-AzureADSubscribedSku
+  $userList = Get-AzureADUser -ObjectID $username | Select -ExpandProperty AssignedLicenses | Select SkuID 
+  $licenseList = $userList | ForEach { $sku=$_.SkuId ; $licensePlanList | ForEach { If ( $sku -eq $_.ObjectId.substring($_.ObjectId.length - 36, 36) ) { $_.SkuPartNumber } } }
+  $virtualUserLicense = $licenselist.contains("PHONESYSTEM_VIRTUALUSER")
+
+  if($virtualUserLicense){
+    $resourceAccount = Get-CsOnlineApplicationInstance -Identity $username
+    if($resourceAccount) {
+      $NEWDDI = Test-DdiFormat $DDI
+      Set-CsPhoneNumberAssignment -Identity $resourceAccount.UserPrincipalName -PhoneNumber $newddi -PhoneNumberType DirectRouting
+    } else {
+      Set-OutputColour "Red" "$Username does not exist yet, please create it and if needed assign the appropriate license first"
+    }  
+  }
+  Else {
+    Set-OutputColour "Red" "$Username does not have a Virtual User license assigned, please assign a license and rerun command"
   }  
 }
-function New-TdrResourceAccount {
-  [CmdletBinding()]
-  [Parameter(Mandatory=$true, ValueFromPipeline=$true, Position=0)]
-  [string]$Username,
-  [Parameter(Mandatory=$true, ValueFromPipeline=$true, Position=1)]
-  [string]$displayName,
-  [Parameter(Mandatory=$true, ValueFromPipeline=$true, Position=2)]
-  [ValidateSet("Queue", "AA")]
-  [string]$type
-  switch ( $type ) {
-      "Queue" { $type = $MSTeamsSettings.CqGuid    }
-      "AA" { $type = $MSTeamsSettings.AaGuid    }
+function New-TdrResourceAccountBulk {
+  $FilePath = "C:\Teams"
+  $csvImport = Import-Csv $FilePath\resource.csv
+
+  $errors = @()
+
+  foreach ($item in $csvImport){ 
+    try {
+      $username = $item.username
+      $type = $item.type
+      $displayName = "$item.displayName"
+      Write-Output "Creating $username"
+      New-TdrResourceAccount -Username $Username -DisplayName $displayName -Type $type
+    } catch {
+      Write-Output "Error enabling $username"
+      $errors += $_
+    }
+    Write-Output "---------------------------------------------------------------------"
   }
-  New-CsOnlineApplicationInstance -UserPrincipalName $Username -ApplicationId $type -DisplayName "$displayName"
+  if ($errors) {
+    Write-Output "The following errors were encountered"
+    $errors
+  }
+}
+function New-TdrResourceAccount {
+  param(
+    [CmdletBinding()]
+    [Parameter(Mandatory=$true, ValueFromPipeline=$true, Position=0)]
+    [string]$Username,
+    [Parameter(Mandatory=$true, ValueFromPipeline=$true, Position=1)]
+    [string]$displayName,
+    [Parameter(Mandatory=$true, ValueFromPipeline=$true, Position=2)]
+    [ValidateSet("Queue", "AA")]
+    [string]$type
+  )
+  switch ( $type ) {
+      "Queue" { $appType = $MSTeamsSettings.CqGuid    }
+      "AA" { $appType = $MSTeamsSettings.AaGuid    }
+  }
+  New-CsOnlineApplicationInstance -UserPrincipalName $Username -ApplicationId $appType -DisplayName "$displayName"
+  if($MSTeamsSettings.role -eq "Gloabl"){
+    #assign a virtual user license
+  }
 }
 function New-TdrRoutingSetup {
   Test-ConnectionStatus MicrosoftTeams
   Set-ModVariables
-  $OnlinePstnGateway = if($MSTeamsSettings.onlinepstngateway2){$MSTeamsSettings.onlinepstngateway1 + ", " + $MSTeamsSettings.onlinepstngateway2} else {$MSTeamsSettings.onlinepstngateway1}
-  Set-CsOnlinePstnUsage -identity Global -Usage @{Add=$pstnusage}
-  New-CsOnlineVoiceRoute -identity $MSTeamsSettings.onlinevoiceroute -NumberPattern $MSTeamsSettings.numpatt -OnlinePstnGatewayList = $OnlinePstnGateway -priority 1 -OnlinePstnUsages $MSTeamsSettings.pstnusage
+  Set-CsOnlinePstnUsage -identity Global -Usage @{Add=$MSTeamsSettings.pstnusage}
+  New-CsOnlineVoiceRoute -identity $MSTeamsSettings.onlinevoiceroute -NumberPattern $MSTeamsSettings.numpatt -OnlinePstnGatewayList $MSTeamsSettings.onlinepstngateway1 -priority 1 -OnlinePstnUsages $MSTeamsSettings.pstnusage
+  If($MSTeamsSettings.onlinepstngateway2){
+    Set-CsOnlineVoiceRoute -Identity $MSTeamsSettings.onlinevoiceroute -OnlinePstnGatewayList @{add=$MSTeamsSettings.onlinepstngateway2}
+  }
   New-CsOnlineVoiceRoutingPolicy $MSTeamsSettings.onlinevoiceroutingpolicy -OnlinePstnUsages $MSTeamsSettings.pstnusage
 }
 function Connect-Tdr {
@@ -94,67 +182,100 @@ function Disconnect-Tdr {
   Set-OutputColour "Green" "Successfully Disconnected from AzureAD"
   Disconnect-MicrosoftTeams
   Set-OutputColour "Green" "Successfully Disconnected from MicrosoftTeams"
-  $MSTeamsSettings.azureadsession = ""
-  $MSTeamsSettings.msteamsession = ""
   New-ModVariables -clear
+}
+function Get-TdrModVariables{
+  $MSTeamsSettings
+}
+function Set-TdrModVariables{
+  New-ModVariables
+  Set-ModVariables
 }
 function Disable-TdrUser {
   [CmdletBinding()]
   param(
-    [Parameter(Mandatory=$true, ValueFromPipeline=$true, Position=0)]
-    [string]$Username
+      [Parameter(Mandatory=$true, ValueFromPipeline=$true, Position=0)]
+      [string]$Username
   )
-  Test-InitialChecks
   $teamsuser = Get-CsOnlineUser -Identity $Username
-  Set-CsUser -Identity $teamsuser.identity -EnterpriseVoiceEnabled $false -HostedVoiceMail $false -OnPremLineURI $null
-  Set-OutputColour "Green" "$username has been disabled"
-}
-function Enable-TdrUser {
-  $FilePath = "C:\Teams"
-  $csvImport = Import-Csv $FilePath\users.csv
-
-  # need to test data formating
-  foreach ($item in $csvImport){
-    $username = $item.username
-    $ddi = "+44" + $item.ddi
-    Write-Output "Enabling $username"
-    $teamsuser = Get-CsOnlineUser -Identity $username
-    Set-CsUser -Identity $teamsuser.id -EnterpriseVoiceEnabled $true -HostedVoiceMail $true -OnPremLineURI tel:$ddi
-    Grant-CsOnlineVoiceRoutingPolicy -Identity $teamsuser.id -PolicyName $onlinevoiceroutingpolicy
-    # Grant-CsTenantDialPlan -Identity $teamsuser.id -PolicyName $tenantdialplan
-    Grant-CsTeamsCallingPolicy -Identity $teamsuser.id -PolicyName AllowCalling
-    Write-Output "---------------------------------------------------------------------"
-  }
+  Remove-CsPhoneNumberAssignment -Identity $teamsuser.id -RemoveAll
+  # Set-CsUser -Identity $teamsuser.id -EnterpriseVoiceEnabled $false -HostedVoiceMail $false -OnPremLineURI $null
 }
 function Enable-TdrUser {
   [CmdletBinding()]
   param(
-    [Parameter(Mandatory=$true, ValueFromPipeline=$true, Position=0)]
+    [Parameter(Mandatory=$true, HelpMessage='Enter the User Account UPN', ValueFromPipeline=$true, Position=0)]
     [string]$Username,
-    [Parameter(Mandatory=$true, ValueFromPipeline=$true, Position=1)]
-    [string]$DDI
+    [Parameter(Mandatory=$true, HelpMessage='Enter the DDI Number to be assigned without the leading 0 e.g. 1273615600', ValueFromPipeline=$true, Position=1)]
+    [string]$DDI,
+    [Parameter(Position=2)]
+    [string]$CLIPolicy
   )
-
-  Test-DdiFormat $DDI
-
+  $newddi = Test-DdiFormat $DDI
   $teamsuser = Get-CsOnlineUser -Identity $Username
-  $allvoiceroutingpolicies = Get-CsOnlineVoiceRoutingPolicy
-  if ($allvoiceroutingpolicies.count -gt 2){
-    $count = 0
-    foreach($i in $allvoiceroutingpolicies){
-      $name = $i.identity -replace 'Tag:(\w+)', '$1'
-      Write-Output $count": Press $count for $name"
-      $count ++
+  $allclipolicies = Get-CsCallingLineIdentity
+
+  if (!($CLIPolicy)){
+    if ($allclipolicies.count -gt 1){
+      $count = 0
+      foreach($i in $allclipolicies){
+        $name = $i.identity -replace 'Tag:(\w+)', '$1'
+        Write-Output $count": Press $count for $name"
+        $count ++
+      }
+      $selectedpolicy = Read-Host "Select the CLI Policy to assign to $username"
+      $SelectedCLIPolicy = $allclipolicies[$selectedpolicy].identity -replace 'Tag:(\w+)', '$1'
+    } else {
+      $CLIPolicy = $allclipolicies[0].identity
     }
-    $selectedpolicy = Read-Host "Select the Voice Routing Policy to assign to $username"
-    $onlinevoiceroutingpolicy = $allvoiceroutingpolicies[$selectedpolicy].identity -replace 'Tag:(\w+)', '$1'
-  } else {
-    $onlinevoiceroutingpolicy = $allvoiceroutingpolicies[0].identity
+  } Else {
+    $SelectedCLIPolicy = $CLIPolicy
   }
-  $onlinevoiceroutingpolicy = $onlinevoiceroutingpolicy -replace 'Tag:(\w+)', '$1'
-  Set-CsUser -Identity $teamsuser.identity -EnterpriseVoiceEnabled $true -HostedVoiceMail $true -OnPremLineURI tel:$DDI
-  Grant-CsOnlineVoiceRoutingPolicy -Identity $teamsuser.identity -PolicyName $onlinevoiceroutingpolicy
-  Grant-CsTeamsCallingPolicy -Identity $teamsuser.identity -PolicyName AllowCalling
+  Set-CsPhoneNumberAssignment -Identity $teamsuser.identity -PhoneNumber $newddi -PhoneNumberType DirectRouting
+  Grant-CsOnlineVoiceRoutingPolicy -Identity $teamsuser.identity -PolicyName $MSTeamsSettings.onlinevoiceroutingpolicy
+  Grant-CsCallingLineIdentity -Identity $teamsuser.identity -PolicyName $SelectedCLIPolicy
+}
+function Enable-TdrUserBulk {
+  $FilePath = "C:\Teams"
+  $csvImport = Import-Csv $FilePath\users.csv
+
+  $allclipolicies = Get-CsCallingLineIdentity
+
+  $errors = @()
+
+  foreach ($item in $csvImport){ 
+    try {
+      $username = $item.username
+      $ddi = $MSTeamsSettings.countryCode + $item.ddi
+      $CLIPolicy = $item.clipolicy
+
+      if (!($CLIPolicy)){
+        if ($allclipolicies.count -gt 1){
+          $count = 0
+          foreach($i in $allclipolicies){
+            $name = $i.identity -replace 'Tag:(\w+)', '$1'
+            Write-Output $count": Press $count for $name"
+            $count ++
+          }
+          $selectedpolicy = Read-Host "Select the CLI Policy to assign to $username"
+          $CLIPolicy = $allclipolicies[$selectedpolicy].identity -replace 'Tag:(\w+)', '$1'
+        } else {
+          $CLIPolicy = $allclipolicies[0].identity
+        }
+      }
+          
+      Write-Output "Enabling $username"
+      Enable-TdrUser -Username $username -DDI $ddi -CLIPolicy $CLIPolicy
+    } catch {
+      Write-Output "Error enabling $username"
+      $errors += $_
+    }
+    Write-Output "---------------------------------------------------------------------"
+  }
+  if ($errors) {
+    Write-Output "The following errors were encountered"
+    $errors
+  }
 }
 function Get-TdrUser {
   [CmdletBinding()]
@@ -168,6 +289,86 @@ function Get-TdrUser {
     'identity','OnPremLineURI','OnPremLineURIManuallySet','LineURI','EnterpriseVoiceEnabled','OnPremEnterpriseVoiceEnabled',
     'HostedVoiceMail','HostedVoicemailPolicy','VoicePolicy','HostingProvider','RegistrarPool','VoiceRoutingPolicy','TeamsCallingPolicy',
     'OnlineVoiceRoutingPolicy','CallerIdPolicy','CallingLineIdentity','TeamsUpgradeEffectiveMode','DialPlan','TenantDialPlan' | fl
+}
+function Test-TdrUser {
+  [CmdletBinding()]
+  param(
+    [Parameter(Mandatory=$true, HelpMessage='Enter the User Account UPN', ValueFromPipeline=$true, Position=0)]
+    [string]$Username,
+    [Parameter(Mandatory=$true, HelpMessage='Enter the DDI Number to be assigned without the leading 0 e.g. 1273615600', ValueFromPipeline=$true, Position=1)]
+    [string]$DDI,
+    [Parameter(Position=2)]
+    [string]$CLIPolicy
+  )
+  try {
+    $teamsuser = Get-CsOnlineUser -Identity $Username
+
+    $userLicenses = Get-AzureADUserLicenseDetail -ObjectID $username
+    $voiceLicense = $userLicenses | foreach { If (($_.SkuPartNumber -eq "MCOEV") -or ($_.SkuPartNumber -eq "SPE_E5")) { $_.SkuPartNumber } }
+
+    If (!($voiceLicense)){
+      Set-OutputColour "Red" "$Username has not been assigned a Phone System license"
+    }
+    ElseIf ($voiceLicense -eq "SPE_E5"){
+      $e5License = $userLicenses | where SkuPartNumber -eq "SPE_E5"
+      $t = $e5License.ServicePlans | foreach { if ($_.ServicePlanName -eq "MCOEV") {$true} }
+      If (!($t)){
+        Set-OutputColour "Red" "$Username is assigned with an E5 license but does not have Phone System enabled"
+      }
+    }
+    Else {
+      Set-OutputColour "Green" "$Username is assigned with Phone System License"
+    }   
+  }
+  Catch {
+    Set-OutputColour "Red" "$username does not exist"
+    Break
+  }
+
+  try {
+    $newddi = Test-DdiFormat $DDI
+    Set-OutputColour "Green" "DDI is in the correct format"
+  }
+  Catch {
+    Set-OutputColour "Red" "DDI is not in the correct format"
+  }
+
+  If ($CLIPolicy){
+    $searchPolicy = "Tag:" + $CLIPolicy
+    try{
+      $cliPolicyCheck = Get-CsCallingLineIdentity -Identity $searchPolicy
+      If ($cliPolicyCheck){
+        Set-OutputColour "Green" "CLI Policy exists"
+      }
+    }
+    Catch {
+      Set-OutputColour "Red" "CLI Policy does not exist"
+    }
+  }
+}
+function Test-TdrUserBulk {
+  $FilePath = "C:\Teams"
+  $csvImport = Import-Csv $FilePath\users.csv
+
+  $errors = @()
+
+  foreach ($item in $csvImport){ 
+    try {
+      $username = $item.username
+      $ddi = $item.ddi
+      $CLIPolicy = $item.clipolicy          
+      Write-Output "Testing $username"
+      Test-TdrUser -Username $username -DDI $ddi -CLIPolicy $CLIPolicy
+    } catch {
+      Write-Output "Error testing $username"
+      $errors += $_
+    }
+    Write-Output "---------------------------------------------------------------------"
+  }
+  if ($errors) {
+    Write-Output "The following errors were encountered"
+    $errors
+  }
 }
 function Check-ModVersion {
   $TdrModPsGallery = find-module MSTeamsDirectRouting
@@ -196,8 +397,9 @@ function New-ModVariables {
     pstnusage = ""
     onlinevoiceroute = ""
     onlinevoiceroutingpolicy = ""
+    countryCode = "+44"
     numpatt = ".*"
-    AaGuiD = "ce933385-9390-45d1-9512-c8d228074e07"
+    AaGuid = "ce933385-9390-45d1-9512-c8d228074e07"
     CqGuid = "11cd3e2e-fccb-42ad-ad00-878b93575e07"
   }
 
@@ -209,7 +411,7 @@ function New-ModVariables {
 function Set-ModVariables {
   do {
     try {
-    [ValidatePattern('^[A-Z]{3}$')]$prefix = Read-Host "Enter the 3 letter prifix to use for this customer, A to Z only" 
+    [ValidatePattern('^[A-Z]{3}$')]$prefix = Read-Host "Enter the 3 letter prifix to use for this Direct Routing connection, A to Z only" 
     } catch {}
   } until ($?)
   $MSTeamsSettings.prefix = $prefix.ToUpper()
@@ -231,33 +433,49 @@ function Set-OutputColour($colour, $text) {
 }
 function Test-ConnectionStatus($modname){
   if(!($MSTeamsSettings.$modname)) {
-    Set-OutputColour "Red" "[❌] Connection to $modname is not present. use the Connect-Tdr command before procceding"
+    Set-OutputColour "Red" "Connection to $modname is not present. use the Connect-Tdr command before procceding"
     break
   }
 }
 function Test-DdiFormat($DDI) {
-  $DDI = $DDI -replace '(^[1-9]\d{9}$)', '+44$1' -replace '^0([1-9]\d{9}$)', '+44$1' -replace '^\+440([1-9]\d{9}$)', '+44$1'
+  $replaceString = $MSTeamsSettings.countryCode + '$1'
+  $ukFormatWithZero = '\' + $MSTeamsSettings.countryCode + '0([1-9]\d{9}$)'
+  $DDI = $DDI -replace '(^[1-9]\d{9}$)', $replaceString -replace '^0([1-9]\d{9}$)', $replaceString -replace $ukFormatWithZero, $replaceString
   $ddicheck = $DDI -match '^\+44[1-9]\d{9}$'
   if (!($ddicheck)){
-    Set-OutputColour "Red" "The DDI must be entered with the full std code without the leading zero or in the E.164 format. e.g. 1273615600 or +441273615600"
-    break
+    throw "Incorrect number format"
+    # Set-OutputColour "Red" "The DDI must be entered with the full std code without the leading zero or in the E.164 format. e.g. 1273615600 or +441273615600"
+    # break
   }
   return $DDI
 }
 function Test-InitialChecks {
   Test-PoshVersion
-  if(!($MSTeamsSettings.AzureAD)) {Test-ModuleInstalled AzureAD}
-  if(!($MSTeamsSettings.MicrosoftTeams)) {Test-ModuleInstalled MicrosoftTeams}
+  if(!($MSTeamsSettings.AzureAD)) {Test-ModuleInstalled "AzureAD","AzureAdPreview"}
+  if(!($MSTeamsSettings.MicrosoftTeams)) {Test-ModuleInstalled "MicrosoftTeams"}
 }
-function Test-ModuleInstalled ([string]$modname) {
-  $moduleinstalled = Get-Module -ListAvailable $modname
-  Set-OutputColour "Green" "Checking $modname module is installed..."
-  if (!($moduleinstalled)){
-    Set-OutputColour "Yellow" "$modname module is not installed. Installing now..."
-    Install-Module -Name $modname -Force
-    Import-Module $modname -Force
+function Test-ModuleInstalled {
+  param(
+    [string[]] $modname=@()
+  )
+  $installed = $false
+  foreach ($mod in $modname) {
+    if (!($installed)) {
+      Set-OutputColour "Green" "Checking $mod module is installed..."
+      $moduleinstalled = Get-Module -ListAvailable $mod
+      if($moduleinstalled) {
+        $installed = $true
+        Set-OutputColour "Green" "$mod is installed"
+      }
+    }
   }
-  $MSTeamsSettings.$modname = "Installed"
+  $newmod = $modname[0]
+  if (!($installed)){
+    Set-OutputColour "Yellow" "$newmod module is not installed. Installing now..."
+    Install-Module -Name $newmod -Force
+    Import-Module $newmod -Force
+  }
+  $MSTeamsSettings.$newmod = "Installed"
 }
 function Test-PoshVersion {
   $posh_major_version = $PSVersionTable.PSVersion.Major

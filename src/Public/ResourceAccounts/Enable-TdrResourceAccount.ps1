@@ -6,11 +6,21 @@ function Enable-TdrResourceAccount {
     [Parameter(Mandatory=$true, ValueFromPipeline=$true, Position=1)]
     [string]$DDI
   )
-  $resourceAccount = Get-CsOnlineApplicationInstance -Identity $username
-  if($resourceAccount) {
-    Test-DdiFormat $DDI
-    Set-CsOnlineApplicationInstance -Identity $Username -OnpremPhoneNumber $DDI
-  } else {
-    Set-OutputColour "Red" "$username does not exist yet, please create it and assign the appropriate license first"
+  $licensePlanList = Get-AzureADSubscribedSku
+  $userList = Get-AzureADUser -ObjectID $username | Select -ExpandProperty AssignedLicenses | Select SkuID 
+  $licenseList = $userList | ForEach { $sku=$_.SkuId ; $licensePlanList | ForEach { If ( $sku -eq $_.ObjectId.substring($_.ObjectId.length - 36, 36) ) { $_.SkuPartNumber } } }
+  $virtualUserLicense = $licenselist.contains("PHONESYSTEM_VIRTUALUSER")
+
+  if($virtualUserLicense){
+    $resourceAccount = Get-CsOnlineApplicationInstance -Identity $username
+    if($resourceAccount) {
+      $NEWDDI = Test-DdiFormat $DDI
+      Set-CsPhoneNumberAssignment -Identity $resourceAccount.UserPrincipalName -PhoneNumber $newddi -PhoneNumberType DirectRouting
+    } else {
+      Set-OutputColour "Red" "$Username does not exist yet, please create it and if needed assign the appropriate license first"
+    }  
+  }
+  Else {
+    Set-OutputColour "Red" "$Username does not have a Virtual User license assigned, please assign a license and rerun command"
   }  
 }

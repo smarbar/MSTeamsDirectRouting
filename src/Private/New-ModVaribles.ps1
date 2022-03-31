@@ -16,8 +16,9 @@ function New-ModVariables {
     pstnusage = ""
     onlinevoiceroute = ""
     onlinevoiceroutingpolicy = ""
+    countryCode = "+44"
     numpatt = ".*"
-    AaGuiD = "ce933385-9390-45d1-9512-c8d228074e07"
+    AaGuid = "ce933385-9390-45d1-9512-c8d228074e07"
     CqGuid = "11cd3e2e-fccb-42ad-ad00-878b93575e07"
   }
 

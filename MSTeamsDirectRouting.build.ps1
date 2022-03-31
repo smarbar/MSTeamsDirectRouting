@@ -1,5 +1,5 @@
 param(
-    $Version
+    $Version = '0.0.1'
 )
 
 $srcPath = "$PSScriptRoot\src"
