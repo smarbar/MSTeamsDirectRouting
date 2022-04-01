@@ -199,7 +199,6 @@ function Disable-TdrUser {
   )
   $teamsuser = Get-CsOnlineUser -Identity $Username
   Remove-CsPhoneNumberAssignment -Identity $teamsuser.id -RemoveAll
-  # Set-CsUser -Identity $teamsuser.id -EnterpriseVoiceEnabled $false -HostedVoiceMail $false -OnPremLineURI $null
 }
 function Enable-TdrUser {
   [CmdletBinding()]
